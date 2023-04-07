@@ -1,8 +1,9 @@
 import * as Bs from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { debounce } from "lodash";
 
 function Product() {
   const [products, setProducts] = useState([]);
@@ -10,6 +11,7 @@ function Product() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchTermDebounced, setSearchTermDebounced] = useState("");
   const [showing, setShowing] = useState(10);
   const MySwal = withReactContent(Swal);
 
@@ -28,14 +30,23 @@ function Product() {
       .catch((error) => {
         console.error("Error:", error);
       });
-  }, [currentPage, showing, searchTerm, showing]);
+  }, [currentPage, showing, searchTermDebounced]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
+  const handleSearchDebounced = useCallback(
+    debounce((value) => {
+      setSearchTermDebounced(value);
+    }, 750),
+    []
+  );
+
   const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
+    const value = event.target.value;
+    setSearchTerm(value);
+    handleSearchDebounced(value);
   };
 
   const handleShow = (event) => {
@@ -50,6 +61,7 @@ function Product() {
       .then((data) => {
         console.log("Success:", data);
         setProducts(products.filter((product) => product.id !== id));
+        setTotalProducts(totalProducts - 1);
         MySwal.fire({
           title: "Successfully!",
           html: "Data deleted succesfully.",

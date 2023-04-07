@@ -1,20 +1,15 @@
-import * as Bs from "react-bootstrap";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Product from "./product/Product";
+import AddNew from "./product/Add";
 
 function App() {
   return (
-    <div className="App">
-      <Bs.Container className="mt-5">
-        <Bs.Row>
-          <Bs.Col>
-            <Bs.Card>
-              <Bs.Card.Body>
-                <Bs.Card.Text>Tabel Mahasiswa</Bs.Card.Text>
-              </Bs.Card.Body>
-            </Bs.Card>
-          </Bs.Col>
-        </Bs.Row>
-      </Bs.Container>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Product />} />
+        <Route path="/add-new" element={<AddNew />} />
+      </Routes>
+    </Router>
   );
 }
 

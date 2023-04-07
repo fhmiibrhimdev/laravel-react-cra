@@ -12,11 +12,22 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         try 
         {
-            $data   = Product::latest()->paginate(10);
+            $perPage = $request->get('showing', 10);
+            $search = $request->get('search', '');
+
+            $query = Product::query();
+
+            if (!empty($search)) {
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%");
+            }
+
+            $data = $query->latest()->paginate($perPage);
+
 
             return response()->json([
                 'data'      => $data,

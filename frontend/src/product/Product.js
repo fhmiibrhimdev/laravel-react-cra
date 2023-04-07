@@ -10,13 +10,17 @@ function Product() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showing, setShowing] = useState(10);
   const itemsPerPage = 10;
   const MySwal = withReactContent(Swal);
 
   const baseURL = "http://192.168.18.11:8000";
 
   useEffect(() => {
-    fetch(`http://192.168.18.11:8000/api/products?page=${currentPage}`)
+    fetch(
+      `${baseURL}/api/products?page=${currentPage}&per_page=${itemsPerPage}&search=${searchTerm}`
+    )
       .then((response) => response.json())
       .then((data) => {
         setProducts(data.data.data);
@@ -26,10 +30,14 @@ function Product() {
       .catch((error) => {
         console.error("Error:", error);
       });
-  }, [currentPage]);
+  }, [currentPage, itemsPerPage, searchTerm]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
   };
 
   const handleDelete = (id) => {
@@ -65,6 +73,24 @@ function Product() {
                     <Bs.Button>Add New</Bs.Button>
                   </Link>
                 </div>
+                <Bs.Form.Control
+                  as="select"
+                  value={showing}
+                  onChange={(e) => setShowing(parseInt(e.target.value))}
+                >
+                  <option value="10">Show 10</option>
+                  <option value="25">Show 25</option>
+                  <option value="50">Show 50</option>
+                  <option value="100">Show 100</option>
+                </Bs.Form.Control>
+                <Bs.Form.Group controlId="formBasicEmail">
+                  <Bs.Form.Control
+                    type="text"
+                    placeholder="Search"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                  />
+                </Bs.Form.Group>
                 <Bs.Table responsive striped bordered hover className="mt-4">
                   <thead>
                     <tr className="text-center">

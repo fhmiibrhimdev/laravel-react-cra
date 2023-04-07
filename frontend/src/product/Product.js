@@ -3,23 +3,34 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import PaginationInfo from "../PaginationInfo";
 
 function Product() {
   const [products, setProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const itemsPerPage = 10;
   const MySwal = withReactContent(Swal);
 
   const baseURL = "http://192.168.18.11:8000";
 
   useEffect(() => {
-    fetch(`${baseURL}/api/products`)
+    fetch(`http://192.168.18.11:8000/api/products?page=${currentPage}`)
       .then((response) => response.json())
       .then((data) => {
         setProducts(data.data.data);
+        setTotalPages(data.data.last_page);
+        setTotalProducts(data.data.total);
       })
       .catch((error) => {
         console.error("Error:", error);
       });
-  }, []);
+  }, [currentPage]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   const handleDelete = (id) => {
     fetch(`${baseURL}/api/products/${id}`, {
@@ -89,6 +100,32 @@ function Product() {
                     ))}
                   </tbody>
                 </Bs.Table>
+                <div className="d-flex justify-content-between align-items-center mt-4">
+                  <div>
+                    Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                    {Math.min(currentPage * itemsPerPage, totalProducts)} of{" "}
+                    {totalProducts} results
+                  </div>
+                  <Bs.Pagination className="mt-4">
+                    <Bs.Pagination.Prev
+                      disabled={currentPage === 1}
+                      onClick={() => handlePageChange(currentPage - 1)}
+                    />
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <Bs.Pagination.Item
+                        key={i}
+                        active={i + 1 === currentPage}
+                        onClick={() => handlePageChange(i + 1)}
+                      >
+                        {i + 1}
+                      </Bs.Pagination.Item>
+                    ))}
+                    <Bs.Pagination.Next
+                      disabled={currentPage === totalPages}
+                      onClick={() => handlePageChange(currentPage + 1)}
+                    />
+                  </Bs.Pagination>
+                </div>
               </Bs.Card.Body>
             </Bs.Card>
           </Bs.Col>

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import PaginationInfo from "../PaginationInfo";
 
 function Product() {
   const [products, setProducts] = useState([]);
@@ -12,14 +11,13 @@ function Product() {
   const [totalProducts, setTotalProducts] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [showing, setShowing] = useState(10);
-  const itemsPerPage = 10;
   const MySwal = withReactContent(Swal);
 
   const baseURL = "http://192.168.18.11:8000";
 
   useEffect(() => {
     fetch(
-      `${baseURL}/api/products?page=${currentPage}&per_page=${itemsPerPage}&search=${searchTerm}`
+      `${baseURL}/api/products?page=${currentPage}&per_page=${showing}&search=${searchTerm}&showing=${showing}`
     )
       .then((response) => response.json())
       .then((data) => {
@@ -30,7 +28,7 @@ function Product() {
       .catch((error) => {
         console.error("Error:", error);
       });
-  }, [currentPage, itemsPerPage, searchTerm]);
+  }, [currentPage, showing, searchTerm, showing]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -38,6 +36,10 @@ function Product() {
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
+  };
+
+  const handleShow = (event) => {
+    setShowing(parseInt(event.target.value));
   };
 
   const handleDelete = (id) => {
@@ -76,8 +78,9 @@ function Product() {
                 <Bs.Form.Control
                   as="select"
                   value={showing}
-                  onChange={(e) => setShowing(parseInt(e.target.value))}
+                  onChange={handleShow}
                 >
+                  <option value="5">Show 5</option>
                   <option value="10">Show 10</option>
                   <option value="25">Show 25</option>
                   <option value="50">Show 50</option>
@@ -128,8 +131,8 @@ function Product() {
                 </Bs.Table>
                 <div className="d-flex justify-content-between align-items-center mt-4">
                   <div>
-                    Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                    {Math.min(currentPage * itemsPerPage, totalProducts)} of{" "}
+                    Showing {(currentPage - 1) * showing + 1} to{" "}
+                    {Math.min(currentPage * showing, totalProducts)} of{" "}
                     {totalProducts} results
                   </div>
                   <Bs.Pagination className="mt-4">

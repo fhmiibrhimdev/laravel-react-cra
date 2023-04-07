@@ -1,7 +1,21 @@
 import * as Bs from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 function Product() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetch("http://192.168.18.11:8000/api/products")
+      .then((response) => response.json())
+      .then((data) => {
+        setProducts(data.data.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }, []);
+
   return (
     <div className="App">
       <Bs.Container className="mt-5">
@@ -26,18 +40,22 @@ function Product() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>1</td>
-                      <td>HP Redmi 9A</td>
-                      <td>HandPhone</td>
-                      <td>169.00</td>
-                      <td className="text-center">
-                        <Bs.Button className="btn btn-warning">Edit</Bs.Button>
-                        <Bs.Button className="btn btn-danger tw-ml-2">
-                          Delete
-                        </Bs.Button>
-                      </td>
-                    </tr>
+                    {products.map((product, index) => (
+                      <tr key={index}>
+                        <td className="text-center">{index + 1}</td>
+                        <td>{product.name}</td>
+                        <td>{product.description}</td>
+                        <td>{product.price}</td>
+                        <td className="text-center">
+                          <Bs.Button className="btn btn-warning">
+                            Edit
+                          </Bs.Button>
+                          <Bs.Button className="btn btn-danger tw-ml-2">
+                            Delete
+                          </Bs.Button>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </Bs.Table>
               </Bs.Card.Body>

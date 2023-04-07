@@ -22,7 +22,7 @@ function AddNew() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    fetch("http://127.0.0.1:8000/api/products", {
+    fetch("http://192.168.18.11:8000/api/products", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

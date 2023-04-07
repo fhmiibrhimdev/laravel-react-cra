@@ -8,8 +8,10 @@ function Product() {
   const [products, setProducts] = useState([]);
   const MySwal = withReactContent(Swal);
 
+  const baseURL = "http://192.168.18.11:8000";
+
   useEffect(() => {
-    fetch("http://192.168.18.11:8000/api/products")
+    fetch(`${baseURL}/api/products`)
       .then((response) => response.json())
       .then((data) => {
         setProducts(data.data.data);
@@ -20,7 +22,7 @@ function Product() {
   }, []);
 
   const handleDelete = (id) => {
-    fetch("http://192.168.18.11:8000/api/products/" + id, {
+    fetch(`${baseURL}/api/products/${id}`, {
       method: "DELETE",
     })
       .then((response) => response.json())
@@ -70,9 +72,12 @@ function Product() {
                         <td>{product.description}</td>
                         <td>{product.price}</td>
                         <td className="text-center">
-                          <Bs.Button className="btn btn-warning">
+                          <Link
+                            to={`/edit/${product.id}`}
+                            className="btn btn-warning mr-2"
+                          >
                             Edit
-                          </Bs.Button>
+                          </Link>
                           <Bs.Button
                             onClick={() => handleDelete(product.id)}
                             className="btn btn-danger tw-ml-2"

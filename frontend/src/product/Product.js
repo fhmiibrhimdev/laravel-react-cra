@@ -1,9 +1,12 @@
 import * as Bs from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 function Product() {
   const [products, setProducts] = useState([]);
+  const MySwal = withReactContent(Swal);
 
   useEffect(() => {
     fetch("http://192.168.18.11:8000/api/products")
@@ -15,6 +18,26 @@ function Product() {
         console.error("Error:", error);
       });
   }, []);
+
+  const handleDelete = (id) => {
+    fetch("http://192.168.18.11:8000/api/products/" + id, {
+      method: "DELETE",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        setProducts(products.filter((product) => product.id !== id));
+        MySwal.fire({
+          title: "Successfully!",
+          html: "Data deleted succesfully.",
+          icon: "success",
+          timer: 1500,
+        });
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
 
   return (
     <div className="App">
@@ -50,7 +73,10 @@ function Product() {
                           <Bs.Button className="btn btn-warning">
                             Edit
                           </Bs.Button>
-                          <Bs.Button className="btn btn-danger tw-ml-2">
+                          <Bs.Button
+                            onClick={() => handleDelete(product.id)}
+                            className="btn btn-danger tw-ml-2"
+                          >
                             Delete
                           </Bs.Button>
                         </td>
